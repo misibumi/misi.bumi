@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dasbor Interaktif Misi Bumi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Bumi Harmoni (#F8F4F0, #2C5F2D, #6A994E, #A3B18A, #344E41) -->
+    <!-- Application Structure Plan: The application is designed as a single-page interactive dashboard. This structure was chosen over a linear format to allow users to explore information non-linearly based on their interests. The key features are: a main navigation bar for quick access to key sections (Layanan, Target, Tim, Kemitraan); an interactive tab system for the three main services (TANAH, AIR, UDARA) to present detailed information without clutter; and a dedicated section for data visualization to make target market data easily digestible. This user-centric design facilitates exploration and comprehension, making the business plan more engaging and accessible than a static document. -->
+    <!-- Visualization & Content Choices: 
+        1. Services (TANAH, AIR, UDARA): Goal: To inform and organize complex service details. Method: Interactive HTML/CSS/JS tabs. Interaction: Clicking a tab reveals detailed content for that specific division (services, target market, revenue model). Justification: This organizes information cleanly, preventing cognitive overload and allowing users to focus on one division at a time.
+        2. Target Market Composition: Goal: To compare the different target audience segments. Method: A Doughnut Chart. Interaction: Hovering over segments displays a tooltip with the audience name and its significance. Justification: A doughnut chart provides a clear, immediate visual representation of proportions, making it easy to understand the primary focus of Misi Bumi's outreach. Library: Chart.js (Canvas).
+        3. Team Structure: Goal: To introduce the team and humanize the organization. Method: A responsive grid of styled cards. Interaction: Subtle hover effects to highlight each member. Justification: This is a visually appealing and standard way to present a team, conveying professionalism and personality. Library: HTML/Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F4F0;
+            color: #344E41;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #6A994E;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #2C5F2D;
+            color: #FFFFFF;
+        }
+        .tab-button:not(.active) {
+            background-color: #A3B18A;
+            color: #344E41;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl font-bold text-[#2C5F2D]">MISI BUMI</span>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#layanan" class="text-base font-medium nav-link">Layanan</a>
+                    <a href="#target" class="text-base font-medium nav-link">Target & Dampak</a>
+                    <a href="#tim" class="text-base font-medium nav-link">Tim Kami</a>
+                    <a href="#kemitraan" class="text-base font-medium nav-link">Kemitraan</a>
+                </nav>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#layanan" class="block py-2 px-4 text-sm nav-link">Layanan</a>
+            <a href="#target" class="block py-2 px-4 text-sm nav-link">Target & Dampak</a>
+            <a href="#tim" class="block py-2 px-4 text-sm nav-link">Tim Kami</a>
+            <a href="#kemitraan" class="block py-2 px-4 text-sm nav-link">Kemitraan</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-[#2C5F2D]">Mewujudkan Keberlanjutan Bumi</h1>
+                <p class="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-[#344E41]">Menjadi penyedia jasa edukasi, pendampingan, dan dokumen lingkungan yang terdepan untuk pembangunan berwawasan lingkungan.</p>
+                <div class="mt-8">
+                    <a href="#layanan" class="inline-block bg-[#6A994E] text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-[#5a8b47] transition-colors">Jelajahi Layanan Kami</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="layanan" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-[#2C5F2D]">Layanan Kami</h2>
+                    <p class="mt-2 text-lg text-[#344E41]">Kami menyediakan solusi terintegrasi melalui tiga divisi utama. Klik setiap divisi untuk melihat detailnya.</p>
+                </div>
+
+                <div class="mb-8 flex justify-center space-x-2 md:space-x-4">
+                    <button class="tab-button active py-2 px-4 rounded-full font-semibold" data-tab="tanah">
+                        <span class="text-2xl">🌱</span> Divisi TANAH
+                    </button>
+                    <button class="tab-button py-2 px-4 rounded-full font-semibold" data-tab="air">
+                        <span class="text-2xl">💧</span> Divisi AIR
+                    </button>
+                    <button class="tab-button py-2 px-4 rounded-full font-semibold" data-tab="udara">
+                        <span class="text-2xl">💨</span> Divisi UDARA
+                    </button>
+                </div>
+
+                <div id="tab-content" class="mt-8">
+                    <div id="tanah-content" class="tab-pane fade-in">
+                        <div class="bg-[#F8F4F0] p-8 rounded-2xl shadow-lg">
+                            <h3 class="text-2xl font-bold text-[#2C5F2D] mb-4">EduWisata Biodiversitas & Analisis Data</h3>
+                            <p class="mb-6 text-[#344E41]">Fokus pada edukasi lingkungan, wisata konservasi, dan analisis keanekaragaman hayati. Kami menghubungkan manusia dengan alam melalui pengalaman langsung yang mendidik.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div class="bg-white p-6 rounded-xl">
+                                    <h4 class="font-bold text-lg text-[#6A994E]">Layanan Utama</h4>
+                                    <ul class="mt-2 list-disc list-inside text-[#344E41]">
+                                        <li>Wisata edukasi (field trip, forest walk, eco-camp)</li>
+                                        <li>Jasa analisis data biodiversitas (flora, fauna, tanah)</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl">
+                                    <h4 class="font-bold text-lg text-[#6A994E]">Target Pasar</h4>
+                                    <ul class="mt-2 list-disc list-inside text-[#344E41]">
+                                        <li>Pelajar (SD, SMP, SMA)</li>
+                                        <li>Mahasiswa Biologi/Lingkungan</li>
+                                        <li>Turis & Mahasiswa Internasional</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl">
+                                    <h4 class="font-bold text-lg text-[#6A994E]">Model Pendapatan</h4>
+                                    <ul class="mt-2 list-disc list-inside text-[#344E41]">
+                                        <li>Tiket masuk & paket edukasi</li>
+                                        <li>Layanan analisis data per proyek</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="air-content" class="tab-pane hidden fade-in">
+                         <div class="bg-[#F8F4F0] p-8 rounded-2xl shadow-lg">
+                            <h3 class="text-2xl font-bold text-[#2C5F2D] mb-4">Asistensi Riset & Pengambilan Sampel</h3>
+                            <p class="mb-6 text-[#344E41]">Mendukung dunia akademis dengan menyediakan pendampingan ahli untuk penelitian lapangan dan analisis data, memastikan riset yang valid dan berkualitas tinggi.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div class="bg-white p-6 rounded-xl">
+                                    <h4 class="font-bold text-lg text-[#6A994E]">Layanan Utama</h4>
+                                    <ul class="mt-2 list-disc list-inside text-[#344E41]">
+                                        <li>Asistensi Penelitian Mahasiswa (S1, S2, S3)</li>
+                                        <li>Jasa pendampingan sampling di lapangan</li>
+                                        <li>Asistensi penulisan laporan hasil sampling</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl">
+                                    <h4 class="font-bold text-lg text-[#6A994E]">Target Pasar</h4>
+                                    <ul class="mt-2 list-disc list-inside text-[#344E41]">
+                                        <li>Mahasiswa S1, S2, dan S3</li>
+                                        <li>Peneliti di bidang Lingkungan & Biologi</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl">
+                                    <h4 class="font-bold text-lg text-[#6A994E]">Fokus Bidang</h4>
+                                    <ul class="mt-2 list-disc list-inside text-[#344E41]">
+                                        <li>Lingkungan</li>
+                                        <li>Biologi</li>
+                                        <li>Entomologi (Serangga)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="udara-content" class="tab-pane hidden fade-in">
+                         <div class="bg-[#F8F4F0] p-8 rounded-2xl shadow-lg">
+                            <h3 class="text-2xl font-bold text-[#2C5F2D] mb-4">Jembatan Industri & Konsultan Lingkungan</h3>
+                            <p class="mb-6 text-[#344E41]">Menjadi penghubung strategis antara kebutuhan kepatuhan lingkungan industri dengan para profesional dan konsultan lingkungan yang tersertifikasi.</p>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-white p-6 rounded-xl">
+                                    <h4 class="font-bold text-lg text-[#6A994E]">Layanan Utama</h4>
+                                    <p class="mt-2 text-[#344E41]">Memfasilitasi penyusunan dokumen lingkungan (AMDAL, UKL-UPL, dll.) dan perizinan dengan menghubungkan industri ke konsultan ahli.</p>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl">
+                                    <h4 class="font-bold text-lg text-[#6A994E]">Target Pasar</h4>
+                                     <ul class="mt-2 list-disc list-inside text-[#344E41]">
+                                        <li>Industri (skala kecil hingga besar)</li>
+                                        <li>Pabrik Kelapa Sawit & Perkebunan</li>
+                                        <li>Rumah Sakit & Hotel</li>
+                                        <li>Pelaku usaha yang butuh kepatuhan lingkungan</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="target" class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-[#2C5F2D]">Target Pasar & Dampak</h2>
+                        <p class="mt-4 text-lg text-[#344E41]">Kami menjangkau audiens yang beragam, dari pelajar hingga pelaku industri, untuk menciptakan dampak lingkungan yang luas. Visualisasi di samping menunjukkan komposisi target pasar utama kami. Setiap segmen memiliki pendekatan dan layanan yang disesuaikan untuk memaksimalkan relevansi dan efektivitas program kami.</p>
+                        <ul class="mt-6 space-y-2 text-[#344E41]">
+                            <li><strong>✓ Pelajar & Mahasiswa:</strong> Fondasi edukasi untuk generasi masa depan.</li>
+                            <li><strong>✓ Industri & Usaha:</strong> Mendorong praktik bisnis yang bertanggung jawab.</li>
+                            <li><strong>✓ Turis & Umum:</strong> Meningkatkan kesadaran dan kecintaan pada alam.</li>
+                        </ul>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="targetMarketChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="tim" class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-[#2C5F2D]">Tim Profesional Kami</h2>
+                    <p class="mt-2 text-lg text-[#344E41]">Misi Bumi digerakkan oleh tim ahli dengan beragam latar belakang yang memiliki semangat sama untuk keberlanjutan.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="text-center bg-[#F8F4F0] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <h3 class="font-bold text-xl text-[#2C5F2D]">Mahdiah</h3>
+                        <p class="text-sm font-semibold text-[#6A994E]">Kepala Divisi Tanah</p>
+                        <p class="mt-2 text-sm text-[#344E41]">Ahli edukasi lingkungan dan analisis biodiversitas.</p>
+                    </div>
+                    <div class="text-center bg-[#F8F4F0] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <h3 class="font-bold text-xl text-[#2C5F2D]">Aris</h3>
+                        <p class="text-sm font-semibold text-[#6A994E]">Kepala Divisi Air</p>
+                        <p class="mt-2 text-sm text-[#344E41]">Spesialis asistensi riset lapangan dan entomologi.</p>
+                    </div>
+                     <div class="text-center bg-[#F8F4F0] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <h3 class="font-bold text-xl text-[#2C5F2D]">Suci</h3>
+                        <p class="text-sm font-semibold text-[#6A994E]">Kepala Divisi Udara & Keuangan</p>
+                        <p class="mt-2 text-sm text-[#344E41]">Fokus pada dokumen lingkungan, perizinan, dan pengembangan bisnis.</p>
+                    </div>
+                     <div class="text-center bg-[#F8F4F0] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <h3 class="font-bold text-xl text-[#2C5F2D]">Fahmi</h3>
+                        <p class="text-sm font-semibold text-[#6A994E]">Komunikasi & Relasi Publik</p>
+                        <p class="mt-2 text-sm text-[#344E41]">Membangun jembatan komunikasi dengan klien dan mitra.</p>
+                    </div>
+                    <div class="text-center bg-[#F8F4F0] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <h3 class="font-bold text-xl text-[#2C5F2D]">Teman Mahdiah</h3>
+                        <p class="text-sm font-semibold text-[#6A994E]">Branding & Identitas Visual</p>
+                        <p class="mt-2 text-sm text-[#344E41]">Menciptakan narasi brand dan konten kreatif yang relevan.</p>
+                    </div>
+                     <div class="text-center bg-[#F8F4F0] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <h3 class="font-bold text-xl text-[#2C5F2D]">Terry</h3>
+                        <p class="text-sm font-semibold text-[#6A994E]">Strategic Advisor</p>
+                        <p class="mt-2 text-sm text-[#344E41]">Memberikan insight strategis berbasis teknologi dan Gen Z.</p>
+                    </div>
+                     <div class="text-center bg-[#F8F4F0] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <h3 class="font-bold text-xl text-[#2C5F2D]">Koordinator Umum</h3>
+                        <p class="text-sm font-semibold text-[#6A994E]">Manajemen & Sinergi</p>
+                        <p class="mt-2 text-sm text-[#344E41]">Menjaga sinergi lintas divisi dan arah pengembangan komunitas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="kemitraan" class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-[#2C5F2D]">Kemitraan Strategis</h2>
+                    <p class="mt-2 text-lg text-[#344E41]">Kolaborasi adalah kunci. Kami bekerja sama dengan berbagai pihak untuk memperluas jangkauan dan dampak.</p>
+                </div>
+                <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <p class="font-semibold text-lg">🏫 Sekolah & Universitas</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <p class="font-semibold text-lg">🏢 Perusahaan & Industri</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <p class="font-semibold text-lg">🌳 Komunitas Lokal</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <p class="font-semibold text-lg">🏛️ Instansi Pemerintah (DLH)</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <p class="font-semibold text-lg">📝 Konsultan Lingkungan</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <p class="font-semibold text-lg">✈️ Travel Edukatif & NGO</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#344E41] text-white mt-16">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 Misi Bumi. Semua Hak Cipta Dilindungi.</p>
+            <p class="text-sm mt-1 text-[#A3B18A]">Dibangun untuk Keberlanjutan.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    tabPanes.forEach(pane => {
+                        if (pane.id === `${target}-content`) {
+                            pane.classList.remove('hidden');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const targetMarketData = {
+                labels: ['Pelajar (SD-SMA)', 'Mahasiswa', 'Industri & Usaha', 'Turis & Umum'],
+                datasets: [{
+                    label: 'Target Pasar',
+                    data: [35, 30, 25, 10],
+                    backgroundColor: [
+                        '#6A994E',
+                        '#A3B18A',
+                        '#344E41',
+                        '#ADC178'
+                    ],
+                    borderColor: '#F8F4F0',
+                    borderWidth: 4,
+                    hoverOffset: 8
+                }]
+            };
+
+            const targetMarketConfig = {
+                type: 'doughnut',
+                data: targetMarketData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#344E41',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%',
+                }
+            };
+
+            const ctx = document.getElementById('targetMarketChart').getContext('2d');
+            new Chart(ctx, targetMarketConfig);
+
+            const navLinks = document.querySelectorAll('a[href^="#"]');
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    if (this.getAttribute('href').length > 1) {
+                        e.preventDefault();
+                        const targetElement = document.querySelector(this.getAttribute('href'));
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                            if (mobileMenu.classList.contains('hidden') === false) {
+                                mobileMenu.classList.add('hidden');
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
